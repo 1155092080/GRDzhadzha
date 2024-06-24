@@ -22,9 +22,9 @@ plot_vars = phi_Re rhoLinMom sourceLinMom
 
 # subpaths - specific directories for hdf5, pout, extraction data
 # (these are created at runtime)
-hdf5_subpath = "hdf5"
-pout_subpath = "pout"
-data_subpath = "data"
+hdf5_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/BoostedBHComplexScalar/BHScalarData/hdf5"
+pout_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/BoostedBHComplexScalar/BHScalarData/pout"
+data_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/BoostedBHComplexScalar/BHScalarData/data"
 
 # change the name of output files
 # pout_prefix = "pout"
