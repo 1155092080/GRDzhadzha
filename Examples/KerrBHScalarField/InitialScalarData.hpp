@@ -71,8 +71,8 @@ class InitialScalarData
         data_t Pi_of_r = 0.0;
         // set the field vars
         for (int i = 0; i < n_modes; i++){
-          phi_of_r += m_params.amplitude * cos(-v_amp*(sin(v_theta[i])*(cos(v_phi[i])*x + sin(v_phi[i])*y) + cos(v_theta[i])*z) + v_phase[i]);
-          Pi_of_r += - m_params.amplitude * omg[i] * sin(-v_amp*(sin(v_theta[i])*(cos(v_phi[i])*x + sin(v_phi[i])*y) + cos(v_theta[i])*z) + v_phase[i]);
+          phi_of_r += m_params.amplitude/std::sqrt(n_modes) * cos(-v_amp*(sin(v_theta[i])*(cos(v_phi[i])*x + sin(v_phi[i])*y) + cos(v_theta[i])*z) + v_phase[i]);
+          Pi_of_r += - m_params.amplitude/std::sqrt(n_modes) * omg[i] * sin(-v_amp*(sin(v_theta[i])*(cos(v_phi[i])*x + sin(v_phi[i])*y) + cos(v_theta[i])*z) + v_phase[i]);
         }
         vars.phi = phi_of_r;
         vars.Pi = Pi_of_r;
