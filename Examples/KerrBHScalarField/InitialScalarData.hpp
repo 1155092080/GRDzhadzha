@@ -26,6 +26,8 @@ class InitialScalarData
     };
     constexpr static int n_modes = 1000;
     double v_amp = 0.1;
+    double fw_trunc_radius = 120.0;
+    double fw_trunc_k = 0.6;
     double v_theta[n_modes];
     double v_phi[n_modes];
     double v_phase[n_modes];
@@ -49,7 +51,7 @@ class InitialScalarData
         v_theta[i] = distributiont(rng); // velocity diirection theta
         v_phi[i] = distributionpi(rng); // velocity diirection phi
         v_phase[i] = distributionpi(rng); // velocity phase
-        omg[i] = std::sqrt(mu*mu + v_amp*v_amp);
+        omg[i] = std::sqrt(mu*mu + mu*mu*v_amp*v_amp);
       }
     }
 
@@ -67,15 +69,18 @@ class InitialScalarData
         data_t x = coords.x;
         double y = coords.y;
         double z = coords.z;
+        double mu = m_params.mass; // scalar field mass
         data_t phi_of_r = 0.0;
         data_t Pi_of_r = 0.0;
         // set the field vars
+        data_t r = sqrt(x*x + y*y + z*z);
+        data_t trunc_coeff = 1.0/(1.0 + exp(fw_trunc_k*(r - fw_trunc_radius)));
         for (int i = 0; i < n_modes; i++){
-          phi_of_r += m_params.amplitude/std::sqrt(n_modes) * cos(-v_amp*(sin(v_theta[i])*(cos(v_phi[i])*x + sin(v_phi[i])*y) + cos(v_theta[i])*z) + v_phase[i]);
-          Pi_of_r += - m_params.amplitude/std::sqrt(n_modes) * omg[i] * sin(-v_amp*(sin(v_theta[i])*(cos(v_phi[i])*x + sin(v_phi[i])*y) + cos(v_theta[i])*z) + v_phase[i]);
+          phi_of_r += m_params.amplitude/std::sqrt(n_modes) * cos(-mu*v_amp*(sin(v_theta[i])*(cos(v_phi[i])*x + sin(v_phi[i])*y) + cos(v_theta[i])*z) + v_phase[i]);
+          Pi_of_r += - m_params.amplitude/std::sqrt(n_modes) * omg[i] * sin(-mu*v_amp*(sin(v_theta[i])*(cos(v_phi[i])*x + sin(v_phi[i])*y) + cos(v_theta[i])*z) + v_phase[i]);
         }
-        vars.phi = phi_of_r;
-        vars.Pi = Pi_of_r;
+        vars.phi = trunc_coeff*phi_of_r;
+        vars.Pi = trunc_coeff*Pi_of_r;
         current_cell.store_vars(vars);
     }
 
