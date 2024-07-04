@@ -21,6 +21,7 @@
 #include "ExcisionDiagnostics.hpp"
 #include "ExcisionEvolution.hpp"
 #include "FluxExtraction.hpp"
+#include "ScalarExtraction.hpp"
 #include "InitialScalarData.hpp"
 #include "KerrSchild.hpp"
 #include "MatterEvolution.hpp"
@@ -102,7 +103,7 @@ void KerrBHScalarLevel::specificPostTimeStep()
     }
 
     // write out the integral after each timestep on minimum level
-    if (m_p.activate_extraction == 1)
+    if (m_p.activate_extraction == 1 || m_p.activate_scalar_extraction == 1)
     {
         if (m_level == min_level)
         {
@@ -134,9 +135,21 @@ void KerrBHScalarLevel::specificPostTimeStep()
             m_gr_amr.m_interpolator->refresh(fill_ghosts);
             m_gr_amr.fill_multilevel_ghosts(
                 VariableType::diagnostic, Interval(c_fluxEnergy, c_fluxAngMom));
-            FluxExtraction my_extraction(m_p.extraction_params, m_dt, m_time,
+            if (m_p.activate_extraction)
+                {
+                    FluxExtraction my_extraction(m_p.extraction_params, m_dt, m_time,
                                          m_restart_time);
-            my_extraction.execute_query(m_gr_amr.m_interpolator, m_p.data_path);
+                    my_extraction.execute_query(m_gr_amr.m_interpolator, m_p.data_path);
+                }
+
+                if (m_p.activate_scalar_extraction)
+                {
+                    ScalarExtraction phi_extraction(
+                        m_p.scalar_extraction_params, m_dt, m_time, first_step,
+                        m_restart_time);
+                    phi_extraction.execute_query(m_gr_amr.m_interpolator, m_p.data_path);
+                }
+            
         }
     }
 }
