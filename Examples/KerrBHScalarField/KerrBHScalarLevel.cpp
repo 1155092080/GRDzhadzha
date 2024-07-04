@@ -147,7 +147,7 @@ void KerrBHScalarLevel::specificPostTimeStep()
                     ScalarExtraction phi_extraction(
                         m_p.scalar_extraction_params, m_dt, m_time, first_step,
                         m_restart_time);
-                    phi_extraction.execute_query(m_gr_amr.m_interpolator, m_p.data_path);
+                    phi_extraction.execute_query(m_gr_amr.m_interpolator);
                 }
             
         }

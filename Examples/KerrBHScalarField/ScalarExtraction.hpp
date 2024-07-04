@@ -37,14 +37,13 @@ class ScalarExtraction : public SphericalExtraction
     }
 
     //! Execute the query
-    void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator,
-                       std::string a_datapath)
+    void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator)
     {
         // extract the values of the scalar field on the spheres
         extract(a_interpolator);
 
         if (m_params.write_extraction)
-            write_extraction(a_datapath + m_params.extraction_file_prefix);
+            write_extraction(m_params.extraction_file_prefix);
 
         // now calculate and write the requested spherical harmonic modes
         std::vector<std::pair<std::vector<double>, std::vector<double>>>

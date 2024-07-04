@@ -10,7 +10,7 @@ verbosity = 0
 # output_path = "" # Main path for all files. Must exist!
 chk_prefix = KerrBH_
 plot_prefix = KerrBHp_
-# restart_file = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/KerrBHScalarField/test/hdf5/KerrBH_004200.3d.hdf5"
+# restart_file = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/KerrBHScalarField/KerrBHScalarFieldData1000new/hdf5/KerrBH_002500.3d.hdf5"
 
 # HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
 checkpoint_interval = 100
@@ -49,7 +49,7 @@ bh_spin = 0.0 # This is a, so needs to be <= M
 
 # For flux (surface) extraction
 activate_extraction = 1
-write_extraction = 0
+write_extraction = 1
 
 num_extraction_radii = 2
 extraction_levels = 0 0      # extraction levels for rhoEnergy
@@ -68,7 +68,6 @@ integral_file_prefix = "rho_phi_mode_"
 
 extraction_subpath = "data/extraction" # directory for 'write_extraction = 1'
 # extraction_file_prefix = "rhoEnergy_extraction_"
-scalar_extraction_file_prefix = "scalar_extraction_"
 
 # scalar_extraction_center = 256 256 256 # defaults to center
 activate_scalar_extraction = 1
