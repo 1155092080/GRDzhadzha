@@ -88,7 +88,7 @@ class FluxExtraction : public SphericalExtraction
         // Setup to integrate fluxes
         std::vector<std::vector<double>> force_integrals(NUM_EXTRACTION_COMPS);
         add_var_integrand(m_fluxEnergy, force_integrals[m_fluxEnergy],
-                          IntegrationMethod::simpson);
+                          IntegrationMethod::trapezium);
         add_var_integrand(m_fluxAngMom, force_integrals[m_fluxAngMom],
                           IntegrationMethod::simpson);
 
