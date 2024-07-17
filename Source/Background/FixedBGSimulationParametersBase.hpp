@@ -50,6 +50,9 @@ class FixedBGSimulationParametersBase : public ChomboParameters
 
         if (activate_extraction)
         {
+            // extraction_params.data_path = data_path;
+            pp.load("flux_integral_file_prefix",
+                    extraction_params.integral_file_prefix);
             pp.load("num_extraction_radii",
                     extraction_params.num_extraction_radii, 2);
             pp.load("extraction_levels", extraction_params.extraction_levels,
