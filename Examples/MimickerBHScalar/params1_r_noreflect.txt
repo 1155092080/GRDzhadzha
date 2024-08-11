@@ -10,7 +10,7 @@ verbosity = 0
 # output_path = "" # Main path for all files. Must exist!
 chk_prefix = MimickerBH_
 plot_prefix = MimickerBHp_
-#restart_file = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_reflect/hdf5/MimickerBH_004500.3d.hdf5"
+#restart_file = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect/hdf5/MimickerBH_004500.3d.hdf5"
 
 # HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
 checkpoint_interval = 100
@@ -22,9 +22,9 @@ plot_vars = phi rhoEnergy fluxAngMom
 
 # subpaths - specific directories for hdf5, pout, extraction data
 # (these are created at runtime)
-hdf5_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_reflect/hdf5"
-pout_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_reflect/pout"
-data_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_reflect/data"
+hdf5_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect/hdf5"
+pout_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect/pout"
+data_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect/data"
 
 # change the name of output files
 # pout_prefix = "pout"
@@ -54,10 +54,10 @@ activate_extraction = 1
 
 num_extraction_radii = 2
 extraction_levels = 0 0      # extraction levels for rhoEnergy
-extraction_radii = 2.0 100.0 # extraction radii for rhoEnergy
+extraction_radii = 0.0 110.0 # extraction radii for rhoEnergy
 
-num_points_phi = 32
-num_points_theta = 48
+num_points_phi = 36
+num_points_theta = 24
 
 num_modes = 4
 modes = 0 0 # l m for spherical harmonics
@@ -91,8 +91,8 @@ scalar_integral_file_prefix = "phi_mode_"
 
 # For volume integrals
 # defaulted to extraction radii values above
-# inner_r = 1.0
-# outer_r = 110.0
+inner_r = 0.0
+outer_r = 110.0
 
 #################################################
 # Grid parameters
@@ -133,13 +133,13 @@ tag_buffer_size = 0 # this example uses a fixed grid
 # Boundary Conditions parameters
 
 #Periodic directions - 0 = false, 1 = true
-isPeriodic = 1 1 1
+isPeriodic = 0 0 0
 # if not periodic, then specify the boundary type
 # 0 = static, 1 = sommerfeld, 2 = reflective
 # 3 = extrapolating, 4 = mixed
 # (see BoundaryConditions.hpp for details)
-#hi_boundary = 1 1 1
-#lo_boundary = 1 1 2
+hi_boundary = 1 1 1
+lo_boundary = 0 0 0
 
 # if reflective boundaries selected, must set
 # parity of all vars (in order given by UserVariables.hpp)
@@ -153,9 +153,9 @@ isPeriodic = 1 1 1
 			 
 # if sommerfeld boundaries selected, must select
 # non zero asymptotic values
-#num_nonzero_asymptotic_vars = 0
-#nonzero_asymptotic_vars = phi
-#nonzero_asymptotic_values = 0.0
+num_nonzero_asymptotic_vars = 1
+nonzero_asymptotic_vars = phi
+nonzero_asymptotic_values = 0.0
 
 # if you are using extrapolating BC:
 extrapolation_order = 0

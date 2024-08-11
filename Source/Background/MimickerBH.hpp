@@ -81,7 +81,7 @@ class MimickerBH
         const double pi = m_params.pi;
         const data_t rs = m_params.rs;
         // std::cout << "rs = " << rs << ", bh_mass = " << M << std::endl; 
-        const double dens = mass*3.0/(4.0*pi*pow(rs,3));
+        const double dens = M*3.0/(4.0*pi*pow(m_params.rs,3));
         const double v2 = v * v;
         const double boost2 = 1.0 / (1 - v2);
         const double boost = sqrt(boost2);
@@ -179,7 +179,7 @@ class MimickerBH
         const double v = m_params.velocity;
         const double pi = m_params.pi;
         const data_t rs = m_params.rs;
-        const double dens = mass*3.0/(4.0*pi*pow(rs,3));
+        const double dens = M*3.0/(4.0*pi*pow(m_params.rs,3));
         const double boost = pow(1 - v * v, -0.5);
 
         // work out where we are on the grid including effect of boost
