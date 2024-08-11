@@ -10,7 +10,7 @@
 #include "GRAMRLevel.hpp"
 // Problem specific includes
 #include "ScalarField.hpp"
-#include "ScalarPotential.hpp"
+#include "SpatialDepScalarPotential.hpp"
 
 //!  A class for the evolution of a scalar field, minimally coupled to gravity
 /*!
@@ -28,7 +28,7 @@ class MimickerBHScalarLevel : public GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
     // Typedef for scalar field
-    typedef ScalarField<ScalarPotential> ScalarFieldWithPotential;
+    typedef ScalarField<SpatialDepScalarPotential> ScalarFieldWithPotential;
 
     //! Initialize data for the field and metric variables
     virtual void initialData();

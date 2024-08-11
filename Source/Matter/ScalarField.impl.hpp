@@ -16,7 +16,7 @@ template <class data_t, template <typename> class vars_t>
 emtensor_t<data_t> ScalarField<potential_t>::compute_emtensor(
     const vars_t<data_t> &vars, const MetricVars<data_t> &metric_vars,
     const vars_t<Tensor<1, data_t>> &d1, const Tensor<2, data_t> &gamma_UU,
-    const Tensor<3, data_t> &chris_phys_ULL) const
+    const Tensor<3, data_t> &chris_phys_ULL, const Coordinates<data_t> &coords) const
 {
     emtensor_t<data_t> out;
 
@@ -27,7 +27,7 @@ emtensor_t<data_t> ScalarField<potential_t>::compute_emtensor(
     // set the potential values
     data_t V_of_phi = 0.0;
     data_t dVdphi = 0.0;
-    my_potential.compute_potential(V_of_phi, dVdphi, vars);
+    my_potential.compute_potential(V_of_phi, dVdphi, vars, coords);
 
     out.rho += V_of_phi;
     out.S += -3.0 * V_of_phi;
@@ -75,7 +75,7 @@ void ScalarField<potential_t>::matter_rhs(
     rhs_vars_t<data_t> &total_rhs, const vars_t<data_t> &vars,
     const MetricVars<data_t> &metric_vars, const vars_t<Tensor<1, data_t>> &d1,
     const diff2_vars_t<Tensor<2, data_t>> &d2,
-    const vars_t<data_t> &advec) const
+    const vars_t<data_t> &advec, const Coordinates<data_t> &coords) const
 {
     // call the function for the rhs excluding the potential
     matter_rhs_excl_potential(total_rhs, vars, metric_vars, d1, d2, advec);
@@ -85,7 +85,7 @@ void ScalarField<potential_t>::matter_rhs(
     data_t dVdphi = 0.0;
 
     // compute potential
-    my_potential.compute_potential(V_of_phi, dVdphi, vars);
+    my_potential.compute_potential(V_of_phi, dVdphi, vars, coords);
 
     // adjust RHS for the potential term
     total_rhs.Pi += -metric_vars.lapse * dVdphi;

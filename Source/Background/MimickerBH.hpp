@@ -33,7 +33,7 @@ class MimickerBH
         double rs = 0.001;
         double pi = 3.1415;
         double mass = 0.0;                      //!<< The mass of the BH
-        double dens = mass*3.0/(4.0*pi*pow(rs,3));
+        // double dens = mass*3.0/(4.0*pi*pow(rs,3));
         std::array<double, CH_SPACEDIM> center; //!< The center of the BH
         double velocity = 0.0; //!< The boost velocity in the x direction
     };
@@ -81,7 +81,7 @@ class MimickerBH
         const double pi = m_params.pi;
         const data_t rs = m_params.rs;
         // std::cout << "rs = " << rs << ", bh_mass = " << M << std::endl; 
-        const double dens = m_params.dens;
+        const double dens = mass*3.0/(4.0*pi*pow(rs,3));
         const double v2 = v * v;
         const double boost2 = 1.0 / (1 - v2);
         const double boost = sqrt(boost2);
@@ -179,7 +179,7 @@ class MimickerBH
         const double v = m_params.velocity;
         const double pi = m_params.pi;
         const data_t rs = m_params.rs;
-        const double dens = m_params.dens;
+        const double dens = mass*3.0/(4.0*pi*pow(rs,3));
         const double boost = pow(1 - v * v, -0.5);
 
         // work out where we are on the grid including effect of boost

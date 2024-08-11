@@ -85,7 +85,8 @@ template <class potential_t = DefaultPotential> class ScalarField
         const vars_t<Tensor<1, data_t>> &d1, //!< the value of the 1st derivs
         const Tensor<2, data_t>
             &gamma_UU, //!< the inverse metric (raised indices)
-        const Tensor<3, data_t> &chris_phys_ULL)
+        const Tensor<3, data_t> &chris_phys_ULL,
+        const Coordinates<data_t> &coords)
         const; //!< the physical christoffel symbol
 
     //! The function which calculates the EM Tensor, given the vars and
@@ -115,7 +116,8 @@ template <class potential_t = DefaultPotential> class ScalarField
             &metric_vars, //!< the value of the metric variables
         const vars_t<Tensor<1, data_t>> &d1,       //!< value of the 1st derivs
         const diff2_vars_t<Tensor<2, data_t>> &d2, //!< value of the 2nd derivs
-        const vars_t<data_t> &advec)
+        const vars_t<data_t> &advec,
+        const Coordinates<data_t> &coords)
         const; //!< the value of the advection terms
 
     //! The function which calculates the RHS for the matter field vars

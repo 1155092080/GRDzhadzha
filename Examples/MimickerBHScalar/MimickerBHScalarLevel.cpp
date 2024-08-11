@@ -26,7 +26,7 @@
 #include "MimickerBH.hpp"
 #include "MatterEvolution.hpp"
 #include "ScalarField.hpp"
-#include "ScalarPotential.hpp"
+#include "SpatialDepScalarPotential.hpp"
 
 // Initial data for field and metric variables
 void MimickerBHScalarLevel::initialData()
@@ -58,7 +58,7 @@ void MimickerBHScalarLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
     // We don't want undefined values floating around in the constraints so
     // zero these
-    ScalarPotential potential(m_p.initial_params);
+    SpatialDepScalarPotential potential(m_p.initial_params);
     ScalarFieldWithPotential scalar_field(potential);
     MimickerBH mimicker_bh(m_p.bg_params, m_dx);
     MatterEvolution<ScalarFieldWithPotential, MimickerBH> my_matter(
@@ -84,7 +84,7 @@ void MimickerBHScalarLevel::specificPostTimeStep()
     if (calculate_diagnostics)
     {
         fillAllGhosts();
-        ScalarPotential potential(m_p.initial_params);
+        SpatialDepScalarPotential potential(m_p.initial_params);
         ScalarFieldWithPotential scalar_field(potential);
         MimickerBH mimicker_bh(m_p.bg_params, m_dx);
         AngularMomConservation<ScalarFieldWithPotential, MimickerBH>

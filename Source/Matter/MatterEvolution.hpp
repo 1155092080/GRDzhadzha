@@ -70,7 +70,7 @@ template <class matter_t, class background_t> class MatterEvolution
 
         // add evolution of matter fields and dissipation
         m_matter.matter_rhs(matter_rhs, matter_vars, metric_vars, d1, d2,
-                            advec);
+                            advec, coords);
         m_deriv.add_dissipation(matter_rhs, current_cell, m_sigma);
 
         // Write the rhs into the output vars for this cell

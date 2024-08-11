@@ -61,7 +61,7 @@ template <class matter_t, class background_t> class EnergyConservation
         const auto chris_phys =
             compute_christoffel(metric_vars.d1_gamma, gamma_UU);
         const emtensor_t<data_t> emtensor = m_matter.compute_emtensor(
-            vars, metric_vars, d1, gamma_UU, chris_phys.ULL);
+            vars, metric_vars, d1, gamma_UU, chris_phys.ULL, coords);
         const auto lapse = metric_vars.lapse;
         const auto shift = metric_vars.shift;
         const data_t det_gamma = compute_determinant_sym(metric_vars.gamma);
