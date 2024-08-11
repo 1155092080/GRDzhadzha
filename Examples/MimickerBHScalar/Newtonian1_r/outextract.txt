@@ -1,4 +1,0 @@
- number_procs = 128
- threads = 2
- mpi provided thread support = serialized
- simd width (doubles) = 2
