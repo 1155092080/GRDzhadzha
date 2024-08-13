@@ -10,7 +10,7 @@ verbosity = 0
 # output_path = "" # Main path for all files. Must exist!
 chk_prefix = MimickerBH_
 plot_prefix = MimickerBHp_
-#restart_file = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect/hdf5/MimickerBH_004500.3d.hdf5"
+#restart_file = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect_debug/hdf5/MimickerBH_004500.3d.hdf5"
 
 # HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
 checkpoint_interval = 100
@@ -22,9 +22,9 @@ plot_vars = phi rhoEnergy fluxAngMom
 
 # subpaths - specific directories for hdf5, pout, extraction data
 # (these are created at runtime)
-hdf5_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect/hdf5"
-pout_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect/pout"
-data_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect/data"
+hdf5_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect_debug/hdf5"
+pout_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect_debug/pout"
+data_subpath = "/lustre/astro/chen/rongzi/project/GRDzhadzha/Examples/MimickerBHScalar/Newtonian1_r_M1_noreflect_debug/data"
 
 # change the name of output files
 # pout_prefix = "pout"

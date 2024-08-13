@@ -15,9 +15,8 @@
 #include "UserVariables.hpp"
 #include "simd.hpp"
 
-//! Class which computes the initial conditions for a boosted BH
-// in isotropic Schwazschild coords
-// Undoosted elem. ds^2 = -Adt + B dx^2
+//! Class which computes the initial conditions for a boosted BH Mimicker
+// Undoosted elem. ds^2 = -Adt^2 + B dx^2
 // Lorentz boost x = \gamma (x' - vt'), t = \gamma (t' - v*x')
 // Addisional shift to fix coordinates to the BH
 // x' = \tilde x + v \tilde t, t' = \tilde t
@@ -30,10 +29,10 @@ class MimickerBH
     //! Struct for the params of the  BH
     struct params_t
     {
-        double rs = 0.001;
+        double rs = 2;  // Radius to smooth the Newtonian potential to avoid singularity
+        double mu = 0.25;   // Mass of scalar field particles
         double pi = 3.1415;
-        double mass = 0.0;                      //!<< The mass of the BH
-        // double dens = mass*3.0/(4.0*pi*pow(rs,3));
+        double mass = 1.0;                      //!<< The mass of the BH
         std::array<double, CH_SPACEDIM> center; //!< The center of the BH
         double velocity = 0.0; //!< The boost velocity in the x direction
     };
@@ -69,17 +68,18 @@ class MimickerBH
         current_cell.store_vars(chi, c_chi);
     }
 
-    /// Schwarzschild boosted solution as above
+    /// Mimicker boosted solution as above
     template <class data_t, template <typename> class vars_t>
     void compute_metric_background(vars_t<data_t> &vars,
                                    const Coordinates<data_t> &coords) const
     {
-        // black hole params - mass M and boost v
+        // Mimicker params - mass M and boost v
         // "boost" is the gamma factor for the boost
         const double M = m_params.mass;
         const double v = m_params.velocity;
         const double pi = m_params.pi;
         const data_t rs = m_params.rs;
+        const data_t mu = m_params.mu;
         // std::cout << "rs = " << rs << ", bh_mass = " << M << std::endl; 
         const double dens = M*3.0/(4.0*pi*pow(m_params.rs,3));
         const double v2 = v * v;
@@ -92,14 +92,14 @@ class MimickerBH
         const double y = coords.y;
         const double z = coords.z;
 
-        // the isotropic radius (boosted)
+        // the radius (boosted)
         const data_t r2 = x_p * x_p + y * y + z * z;
         const data_t r = sqrt(r2);
 
-        // find the H, A, B metric quantities
-        const data_t H = simd_conditional(simd_compare_gt(r, rs), 0.5 * M / r, 4.0/3.0*pi*dens*pow(r,2)); //(r>rs) ? 0.5*M/r : 4.0/3.0*pi*dens*pow(r,2)
+        // find the H, A, B metric quantities, using weak field approximation, ds^2=-Adt^2+Bdx^2 = -(1+2H)dt^2+(1-2H)dx^2, where H is Newtonian potential
+        const data_t H = simd_conditional(simd_compare_gt(r, rs), mu*2.0/3.0*pi*pow(rs,2)*dens + mu*M*(1/rs -1/r), mu*2.0/3.0*pi*pow(r,2)*dens); //(r>rs) ? mu*2.0/3.0*pi*pow(rs,2)*dens + mu*M*(1/rs -1/r) : mu*2.0/3.0*pi*pow(r,2)*dens
         const data_t A = (1+2*H);
-        const data_t B = A;
+        const data_t B = (1-2*H);
 
         // Calculate the gradients of A and B
         Tensor<1, data_t> dAdx, dBdx;
@@ -177,6 +177,7 @@ class MimickerBH
         // black hole params - mass M and boost v
         const double M = m_params.mass;
         const double v = m_params.velocity;
+        const data_t mu = m_params.mu;
         const double pi = m_params.pi;
         const data_t rs = m_params.rs;
         const double dens = M*3.0/(4.0*pi*pow(m_params.rs,3));
@@ -195,8 +196,9 @@ class MimickerBH
         const data_t r = sqrt(r2);
 
         // find H
-        const data_t H = simd_conditional(simd_compare_gt(r, rs), 0.5 * M / r, 4.0/3.0*pi*dens*pow(r,2)); //(r>rs) ? 0.5*M/r : 4.0/3.0*pi*dens*pow(r,2)
+        const data_t H = simd_conditional(simd_compare_gt(r, rs), mu*2.0/3.0*pi*pow(rs,2)*dens + mu*M*(1/rs -1/r), mu*2.0/3.0*pi*pow(r,2)*dens); //(r>rs) ? mu*2.0/3.0*pi*pow(rs,2)*dens + mu*M*(1/rs -1/r) : mu*2.0/3.0*pi*pow(r,2)*dens
         const data_t A = (1+2*H);
+        const data_t B = (1-2*H);
 
         using namespace TensorAlgebra;
         // derivatives of r wrt actual grid coords
@@ -208,9 +210,10 @@ class MimickerBH
         Tensor<1, data_t> dHdx;
         FOR1(i)
         {
-            dHdx[i] = simd_conditional(simd_compare_gt(r, rs), -0.5 * M / r / r * drdx[i], 8.0/3.0*pi*dens*r* drdx[i]); //(r>rs) ? -0.5 * M / r / r * drdx[i] : 8.0/3.0*pi*dens*r* drdx[i]
-            dAdx[i] = 2 * dHdx[i];
-            dBdx[i] = 2 * dHdx[i];
+            dHdx[i] = 
+            dHdx[i] = simd_conditional(simd_compare_gt(r, rs),  M * mu / r / r * drdx[i], mu*4.0/3.0*pi*r*dens*drdx[i]); //(r>rs) ? M * mu / r / r * drdx[i]: mu*4.0/3.0*pi*r*dens*drdx[i]
+            dAdx[i] = 2 * dHdx[i];  
+            dBdx[i] = -2 * dHdx[i];
         }
     }
 
@@ -219,29 +222,8 @@ class MimickerBH
     // note that this is not templated over data_t
     bool check_if_excised(const Coordinates<double> &coords) const
     {
-        // // black hole params - mass M and boost v
-        // // "boost" is the gamma factor for the boost
-        // const double M = m_params.mass;
-        // const double boost =
-        //     pow(1.0 - m_params.velocity * m_params.velocity, -0.5);
-
-        // // work out where we are on the grid including effect of boost
-        // // on x direction (length contraction)
-        // const double x_p = coords.x * boost;
-        // const double y = coords.y;
-        // const double z = coords.z;
-
-        // // the coordinate radius (boosted)
-        // const double r2 = x_p * x_p + y * y + z * z;
-
-        // // compare this to horizon in isotropic coords
-        // const double r_horizon = 0.0001 * M; // set a very small excision radius
         bool is_excised = false;
 
-        // if (sqrt(r2) / r_horizon < 0.5)
-        // {
-        //     is_excised = true;
-        // }
         return is_excised;
     }
 };
