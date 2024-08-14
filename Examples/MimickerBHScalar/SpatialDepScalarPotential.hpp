@@ -29,7 +29,7 @@ class SpatialDepScalarPotential
     {
         // work out where we are on the grid including effect of boost
         // on x direction (length contraction)
-        
+        const double pi = M_PI;
         const data_t x_p = coords.x;
         const double y = coords.y;
         const double z = coords.z;
@@ -41,13 +41,13 @@ class SpatialDepScalarPotential
         // 1/2 m^2 phi^2
         const double mu = m_initial_params.mass;
         const double lambda = 0.02;
-        // V_of_phi = 0.5 * mu * mu * pow(atan(1.0/200.0*r),2) * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi;
-        V_of_phi = 0.5 * mu * mu * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi;
+        //V_of_phi = 0.5 * mu * mu * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi;
+        V_of_phi = 0.5 * mu * mu * pow(0.5/pi*(atan(abs(r)-110.0)+pi/2.0), 2) * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi;
 
         // The potential gradient at phi wrt the field
         // m^2 phi
-        // dVdphi = mu * mu * pow(atan(1.0/200.0*r),2) * vars.phi + 1.0/2.0/3.0 * lambda * vars.phi * vars.phi * vars.phi;
-        dVdphi = mu * mu * vars.phi + 1.0/2.0/3.0 * lambda * vars.phi * vars.phi * vars.phi;
+        //dVdphi = mu * mu * vars.phi + 1.0/2.0/3.0 * lambda * vars.phi * vars.phi * vars.phi;
+        dVdphi = mu * mu * pow(0.5/pi*(atan(abs(r)-110.0)+pi/2.0), 2) * vars.phi + 1.0/2.0/3.0 * lambda * vars.phi * vars.phi * vars.phi;
     }
 };
 

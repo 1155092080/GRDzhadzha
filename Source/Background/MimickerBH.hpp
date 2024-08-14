@@ -31,7 +31,7 @@ class MimickerBH
     {
         double rs = 2;  // Radius to smooth the Newtonian potential to avoid singularity
         double mu = 0.25;   // Mass of scalar field particles
-        double pi = 3.1415;
+        double pi = M_PI;
         double mass = 1.0;                      //!<< The mass of the BH
         std::array<double, CH_SPACEDIM> center; //!< The center of the BH
         double velocity = 0.0; //!< The boost velocity in the x direction
