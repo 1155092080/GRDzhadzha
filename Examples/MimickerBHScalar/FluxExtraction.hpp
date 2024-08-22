@@ -90,7 +90,7 @@ class FluxExtraction : public SphericalExtraction
         add_var_integrand(m_fluxEnergy, force_integrals[m_fluxEnergy],
                           IntegrationMethod::trapezium);
         add_var_integrand(m_fluxAngMom, force_integrals[m_fluxAngMom],
-                          IntegrationMethod::simpson);
+                          IntegrationMethod::trapezium);
 
         // do the integration over the surface
         // integrate() do integration on all integrands added by add_integrand

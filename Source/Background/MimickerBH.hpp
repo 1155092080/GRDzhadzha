@@ -15,13 +15,9 @@
 #include "UserVariables.hpp"
 #include "simd.hpp"
 
-//! Class which computes the initial conditions for a boosted BH Mimicker
-// Undoosted elem. ds^2 = -Adt^2 + B dx^2
-// Lorentz boost x = \gamma (x' - vt'), t = \gamma (t' - v*x')
-// Addisional shift to fix coordinates to the BH
-// x' = \tilde x + v \tilde t, t' = \tilde t
-// BH appears fixed, but we're in the rest frame of the unboosted observer!
-// See https://arxiv.org/pdf/2106.08280.pdf for details
+//! Class which computes the initial conditions for a BH Mimicker
+// From https://arxiv.org/pdf/2106.08280
+// and metric from https://arxiv.org/pdf/2110.06937
 
 class MimickerBH
 {
@@ -29,12 +25,10 @@ class MimickerBH
     //! Struct for the params of the  BH
     struct params_t
     {
-        double rs = 2;  // Radius to smooth the Newtonian potential to avoid singularity
-        double mu = 0.25;   // Mass of scalar field particles
+        double L0 = 5.0;  // Radius of compact star
         double pi = M_PI;
         double mass = 1.0;                      //!<< The mass of the BH
         std::array<double, CH_SPACEDIM> center; //!< The center of the BH
-        double velocity = 0.0; //!< The boost velocity in the x direction
     };
 
     template <class data_t> using Vars = ADMFixedBGVars::Vars<data_t>;
@@ -44,11 +38,10 @@ class MimickerBH
 
     MimickerBH(params_t a_params, double a_dx) : m_params(a_params), m_dx(a_dx)
     {
-        // check this boost param is sensible
-        if ((m_params.velocity > 1.0) || (m_params.velocity < -1.0))
+        // check the L0 so that avoid horizon
+        if ((m_params.L0 < 9.0*m_params.mass/4.0))
         {
-            MayDay::Error("The boost velocity parameter must be in the range "
-                          "-1.0 < velocity < 1.0");
+            MayDay::Error("L0 should be larger than 9m/4 to avoid horizon");
         }
     }
 
@@ -62,84 +55,83 @@ class MimickerBH
         compute_metric_background(metric_vars, coords);
 
         // calculate and save chi
-        data_t chi = TensorAlgebra::compute_determinant_sym(metric_vars.gamma);
+        data_t chi = TensorAlgebra::compute_determinant(metric_vars.gamma);
         chi = pow(chi, -1.0 / 3.0);
-
         current_cell.store_vars(chi, c_chi);
     }
 
-    /// Mimicker boosted solution as above
+    /// Mimicker solution as above
     template <class data_t, template <typename> class vars_t>
     void compute_metric_background(vars_t<data_t> &vars,
                                    const Coordinates<data_t> &coords) const
     {
-        // Mimicker params - mass M and boost v
-        // "boost" is the gamma factor for the boost
+        // Mimicker params - mass M and radius L0
         const double M = m_params.mass;
-        const double v = m_params.velocity;
+        const double L0 = m_params.L0;
         const double pi = m_params.pi;
-        const data_t rs = m_params.rs;
-        const data_t mu = m_params.mu;
-        // std::cout << "rs = " << rs << ", bh_mass = " << M << std::endl; 
-        const double dens = M*3.0/(4.0*pi*pow(m_params.rs,3));
-        const double v2 = v * v;
-        const double boost2 = 1.0 / (1 - v2);
-        const double boost = sqrt(boost2);
+        // const double dens = M*3.0/(4.0*pi*pow(m_params.L0,3));
 
-        // work out where we are on the grid including effect of boost
-        // on x direction (length contraction)
-        const data_t x_p = coords.x * boost;
-        const double y = coords.y;
-        const double z = coords.z;
+        // work out coordinates
+        const data_t x = coords.x;
+        const data_t y = coords.y;
+        const data_t z = coords.z;
 
         // the radius (boosted)
-        const data_t r2 = x_p * x_p + y * y + z * z;
-        const data_t r = sqrt(r2);
+        const data_t r = coords.get_radius();
+        const data_t r2 = r * r;
+        const data_t L3 = pow(L0, 3);
 
-        // find the H, A, B metric quantities, using weak field approximation, ds^2=-Adt^2+Bdx^2 = -(1+2H)dt^2+(1-2H)dx^2, where H is Newtonian potential
-        const data_t H = simd_conditional(simd_compare_gt(r, rs), mu*2.0/3.0*pi*pow(rs,2)*dens + mu*M*(1/rs -1/r), mu*2.0/3.0*pi*pow(r,2)*dens); //(r>rs) ? mu*2.0/3.0*pi*pow(rs,2)*dens + mu*M*(1/rs -1/r) : mu*2.0/3.0*pi*pow(r,2)*dens
-        const data_t A = (1+2*H);
-        const data_t B = (1-2*H);
+        // Inner and outer metric components
 
-        // Calculate the gradients of A and B
-        Tensor<1, data_t> dAdx, dBdx;
-        get_metric_derivs(dAdx, dBdx, coords);
+        const data_t alpha_inner = 3.0/2.0 * sqrt(1 - 2*M/L0) - 1.0/2.0 * sqrt(1 - 2*M*r2/L3);
+        const data_t alpha_outer = sqrt(1 - 2*M/r);
+        const data_t H = simd_conditional(simd_compare_gt(r, L0), M/r2/(r - 2*M), M/(L3 - 2*M*r2)); // g_ab = eta_ab + 2H el_a el_b
+
+        const Tensor<1, data_t> el = {x, y, z};
+
+        // Calculate the gradients in el and H
+        Tensor<1, data_t> dHdx;
+        Tensor<1, data_t> drdx;
+        Tensor<2, data_t> dldx;
+        get_Mimiker_derivs(dHdx, dldx, drdx, H, coords);
 
         // populate ADM vars
-        // (Keep lapse negative within the horizon)
-        vars.lapse = sqrt(A) / boost * sqrt(B / (B - A * v2));
+        // (No horizon, so lapse always positive)
+        vars.lapse = simd_conditional(simd_compare_gt(r, L0), alpha_outer, alpha_inner); // r>L0? alpha_outer:alpha_inner
+
+        FOR2(i, j)
+        {
+            vars.gamma[i][j] =
+                TensorAlgebra::delta(i, j) + 2.0 * H * el[i] * el[j];
+        }
 
         using namespace TensorAlgebra;
-        FOR2(i, j) { vars.gamma[i][j] = delta(i, j) * B; }
-        vars.gamma[0][0] = boost2 * (vars.gamma[0][0] - A * v2);
-        const auto gamma_UU = compute_inverse_sym(vars.gamma);
+        const auto gamma_UU = compute_inverse(vars.gamma);
 
-        // this adjustment gives the shift which achieves x' = x - vt
-        FOR1(i) { vars.shift[i] = delta(i, 0) * A * v / boost2 / (B - A * v2); }
+        // For static metric, shift = 0
+        FOR1(i) { vars.shift[i] = 0.0; }
 
         // Calculate partial derivative of spatial metric
-        FOR3(i, j, k) { vars.d1_gamma[i][j][k] = delta(i, j) * dBdx[k]; }
-        FOR1(i)
+        FOR3(i, j, k)
         {
-            vars.d1_gamma[0][0][i] =
-                (vars.d1_gamma[0][0][i] - dAdx[i] * v2) * boost2;
+            vars.d1_gamma[i][j][k] =
+                2.0 * (el[i] * el[j] * dHdx[k] + H * el[i] * dldx[j][k] +
+                       H * el[j] * dldx[i][k]);
         }
 
         // calculate derivs of lapse and shift
         FOR1(i)
         {
-            vars.d1_lapse[i] = 0.5 * vars.lapse *
-                               (dAdx[i] / A + dBdx[i] / B -
-                                (dBdx[i] - v2 * dAdx[i]) / (B - v2 * A));
+            vars.d1_lapse[i] = simd_conditional(simd_compare_gt(r, L0),
+                                                M /r2 / alpha_outer * drdx[i], 
+                                                M / L3 / sqrt(1 - 2*M*r2/L3)* r * drdx[i]
+            );
         }
 
-        // use the fact that shift^i = lapse^2 * shift_i + v^i
-        // and v^i is a constant vector
+        // use the fact that shift^i = lapse^2 * shift_i = 0
         FOR2(i, j)
         {
-            vars.d1_shift[i][j] =
-                delta(i, 0) * vars.shift[0] *
-                (dAdx[j] / A - (dBdx[j] - dAdx[j] * v2) / (B - A * v2));
+            vars.d1_shift[i][j] = 0.0;
         }
 
         // calculate the extrinsic curvature, using the fact that
@@ -168,52 +160,41 @@ class MimickerBH
     }
 
   protected:
-    /// Work out the gradients of the quantities H, A and B appearing in the
-    /// Isotropic Schwarzschild solution
+    /// Work out the gradients of the quantities H and el and r
     template <class data_t>
-    void get_metric_derivs(Tensor<1, data_t> &dAdx, Tensor<1, data_t> &dBdx,
-                           const Coordinates<data_t> &coords) const
+    void get_Mimiker_derivs(Tensor<1, data_t> &dHdx, Tensor<2, data_t> &dldx,
+                       Tensor<1, data_t> &drdx, const data_t &H,
+                       const Coordinates<data_t> &coords) const
     {
-        // black hole params - mass M and boost v
+        // black hole mimicker params - mass M and radium L0
         const double M = m_params.mass;
-        const double v = m_params.velocity;
-        const data_t mu = m_params.mu;
+        const double L0 = m_params.L0;
         const double pi = m_params.pi;
-        const data_t rs = m_params.rs;
-        const double dens = M*3.0/(4.0*pi*pow(m_params.rs,3));
-        const double boost = pow(1 - v * v, -0.5);
 
-        // work out where we are on the grid including effect of boost
-        // on x direction (length contraction)
+        // work out where we are on the grid and useful quantities
         Tensor<1, data_t> x;
         x[0] = coords.x;
         x[1] = coords.y;
         x[2] = coords.z;
-        const data_t x_p = coords.x * boost;
-
-        // the coordinate radius (boosted), subject to a floor
-        const data_t r2 = x_p * x_p + x[1] * x[1] + x[2] * x[2];
-        const data_t r = sqrt(r2);
-
-        // find H
-        const data_t H = simd_conditional(simd_compare_gt(r, rs), mu*2.0/3.0*pi*pow(rs,2)*dens + mu*M*(1/rs -1/r), mu*2.0/3.0*pi*pow(r,2)*dens); //(r>rs) ? mu*2.0/3.0*pi*pow(rs,2)*dens + mu*M*(1/rs -1/r) : mu*2.0/3.0*pi*pow(r,2)*dens
-        const data_t A = (1+2*H);
-        const data_t B = (1-2*H);
+        const data_t r = coords.get_radius();
+        const data_t r2 = r * r;
+        const data_t L3 = L0 * L0 * L0;
 
         using namespace TensorAlgebra;
         // derivatives of r wrt actual grid coords
-        Tensor<1, data_t> drdx;
         FOR1(i) { drdx[i] = x[i] / r; }
-        drdx[0] *= boost * boost;
 
-        // derivs of quantities
-        Tensor<1, data_t> dHdx;
+        // derivs of quantities H and el
         FOR1(i)
         {
-            dHdx[i] = 
-            dHdx[i] = simd_conditional(simd_compare_gt(r, rs),  M * mu / r / r * drdx[i], mu*4.0/3.0*pi*r*dens*drdx[i]); //(r>rs) ? M * mu / r / r * drdx[i]: mu*4.0/3.0*pi*r*dens*drdx[i]
-            dAdx[i] = 2 * dHdx[i];  
-            dBdx[i] = -2 * dHdx[i];
+            dHdx[i] = -pow(H, 2)/M;
+            dHdx[i] *= simd_conditional(simd_compare_gt(r, L0),  3*pow(r, 2)-4*M*r, -4*M*r);
+            dHdx[i] *= drdx[i];
+        }
+
+        FOR2(i, j)
+        {
+            dldx[i][j] = delta(i, j); // Because l = {x, y, z}
         }
     }
 
