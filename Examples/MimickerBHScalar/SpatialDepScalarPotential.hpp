@@ -41,13 +41,13 @@ class SpatialDepScalarPotential
         // 1/2 m^2 phi^2
         const double mu = m_initial_params.mass;
         const double lambda = 0.02; // lambda = 8.0 * g * mu^2 and g = -1/(8*fa^2)
-        V_of_phi = 0.5 * mu * mu * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi;
-        // V_of_phi = 0.5 * mu * mu * pow(0.5/pi*(atan(abs(r)-200.0)+pi/2.0), 2) * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * (pow(0.5/pi*(atan(abs(r)-200.0)+pi/2.0), 2)) * vars.phi * vars.phi * vars.phi * vars.phi;
+        // V_of_phi = 0.5 * mu * mu * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi;
+        V_of_phi = 0.5 * mu * mu * pow(0.5/pi*(atan(abs(r)-200.0)+pi/2.0), 2) * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * (pow(0.5/pi*(atan(abs(r)-200.0)+pi/2.0), 2)) * vars.phi * vars.phi * vars.phi * vars.phi;
 
         // The potential gradient at phi wrt the field
         // m^2 phi
-        dVdphi = mu * mu * vars.phi + 1.0/2.0/3.0 * lambda * vars.phi * vars.phi * vars.phi;
-        // dVdphi = mu * mu * pow(0.5/pi*(atan(abs(r)-200.0)+pi/2.0), 2) * vars.phi + 1.0/2.0/3.0 * lambda * (pow(0.5/pi*(atan(abs(r)-200.0)+pi/2.0), 2)) * vars.phi * vars.phi * vars.phi;
+        // dVdphi = mu * mu * vars.phi + 1.0/2.0/3.0 * lambda * vars.phi * vars.phi * vars.phi;
+        dVdphi = mu * mu * pow(0.5/pi*(atan(abs(r)-200.0)+pi/2.0), 2) * vars.phi + 1.0/2.0/3.0 * lambda * (pow(0.5/pi*(atan(abs(r)-200.0)+pi/2.0), 2)) * vars.phi * vars.phi * vars.phi;
     }
 };
 

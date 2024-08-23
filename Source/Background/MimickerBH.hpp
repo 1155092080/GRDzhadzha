@@ -187,7 +187,7 @@ class MimickerBH
         // derivs of quantities H and el
         FOR1(i)
         {
-            dHdx[i] = -pow(H, 2)/M;
+            dHdx[i] = (M==0.0)? 0.0: -pow(H, 2)/M;
             dHdx[i] *= simd_conditional(simd_compare_gt(r, L0),  3*pow(r, 2)-4*M*r, -4*M*r);
             dHdx[i] *= drdx[i];
         }
