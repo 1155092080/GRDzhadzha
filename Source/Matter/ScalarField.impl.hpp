@@ -103,7 +103,7 @@ void ScalarField<potential_t>::matter_rhs_excl_potential(
 {
     using namespace TensorAlgebra;
 
-    const auto gamma_UU = compute_inverse_sym(metric_vars.gamma);
+    const auto gamma_UU = compute_inverse(metric_vars.gamma);
     const auto chris_phys = compute_christoffel(metric_vars.d1_gamma, gamma_UU);
 
     // evolution equations for scalar field and (minus) its conjugate momentum

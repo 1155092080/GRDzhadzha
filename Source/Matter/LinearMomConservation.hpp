@@ -62,12 +62,12 @@ template <class matter_t, class background_t> class LinearMomConservation
 
         // some useful quantities
         using namespace TensorAlgebra;
-        const auto gamma_UU = compute_inverse_sym(metric_vars.gamma);
+        const auto gamma_UU = compute_inverse(metric_vars.gamma);
         const auto chris_phys =
             compute_christoffel(metric_vars.d1_gamma, gamma_UU);
         const emtensor_t<data_t> emtensor = m_matter.compute_emtensor(
             vars, metric_vars, d1, gamma_UU, chris_phys.ULL);
-        const data_t det_gamma = compute_determinant_sym(metric_vars.gamma);
+        const data_t det_gamma = compute_determinant(metric_vars.gamma);
         const data_t R = coords.get_radius();
         data_t rho2 =
             simd_max(coords.x * coords.x + coords.y * coords.y, 1e-12);
