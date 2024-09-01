@@ -25,9 +25,9 @@ class InitialScalarData
         std::array<double, CH_SPACEDIM> center;
     };
     constexpr static int n_modes = 1000;
-    double v_amp = 0.1;
-    double fw_trunc_radius = 100.0;
-    double fw_trunc_k = 0.2;
+    double v_amp = 0.2;
+    double fw_trunc_radius = 80.0;
+    double fw_trunc_k = 0.4;
     double v_theta[n_modes];
     double v_phi[n_modes];
     double v_phase[n_modes];

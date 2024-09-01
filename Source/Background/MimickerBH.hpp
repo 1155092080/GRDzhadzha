@@ -25,7 +25,7 @@ class MimickerBH
     //! Struct for the params of the  BH
     struct params_t
     {
-        double L0 = 5.0;  // Radius of compact star
+        double L0 = 3.0;  // Radius of compact star
         double pi = M_PI;
         double mass = 1.0;                      //!<< The mass of the BH
         std::array<double, CH_SPACEDIM> center; //!< The center of the BH
