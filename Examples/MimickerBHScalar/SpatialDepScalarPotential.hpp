@@ -40,7 +40,7 @@ class SpatialDepScalarPotential
         // The potential value at phi
         // 1/2 m^2 phi^2
         const double mu = m_initial_params.mass;
-        const double lambda = 0.113; // lambda = 8.0 * g * mu^2 and g = -1/(8*fa^2)
+        const double lambda = 0.057; // lambda = 8.0 * g * mu^2 and g = -1/(8*fa^2)
         V_of_phi = 0.5 * mu * mu * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi;
         //V_of_phi = (0.5 * mu * mu * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi) * pow(1.0 + 1.0/pi*(atan(abs(r)-150.0)+pi/2.0), 2);
 

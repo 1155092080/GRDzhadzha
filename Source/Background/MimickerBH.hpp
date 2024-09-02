@@ -55,7 +55,7 @@ class MimickerBH
         compute_metric_background(metric_vars, coords);
 
         // calculate and save chi
-        data_t chi = TensorAlgebra::compute_determinant(metric_vars.gamma);
+        data_t chi = TensorAlgebra::compute_determinant_sym(metric_vars.gamma);
         chi = pow(chi, -1.0 / 3.0);
         current_cell.store_vars(chi, c_chi);
     }
@@ -106,7 +106,7 @@ class MimickerBH
         }
 
         using namespace TensorAlgebra;
-        const auto gamma_UU = compute_inverse(vars.gamma);
+        const auto gamma_UU = compute_inverse_sym(vars.gamma);
 
         // For static metric, shift = 0
         FOR1(i) { vars.shift[i] = 0.0; }
