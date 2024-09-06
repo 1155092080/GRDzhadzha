@@ -42,12 +42,12 @@ class SpatialDepScalarPotential
         const double mu = m_initial_params.mass;
         const double lambda = 0.04; // lambda = 8.0 * g * mu^2 and g = -1/(8*fa^2)
         //V_of_phi = 0.5 * mu * mu * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi;
-        V_of_phi = (0.5 * mu * mu * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi) * pow(1.0 + 1.0/pi*(atan(abs(r)-110.0)+pi/2.0), 2);
+        V_of_phi = (0.5 * mu * mu * vars.phi * vars.phi + 1.0/2.0/3.0/4.0 * lambda * vars.phi * vars.phi * vars.phi * vars.phi) * pow(1.0 + 1.0/pi*(atan(abs(r)-470.0)+pi/2.0), 2);
 
         // The potential gradient at phi wrt the field
         // m^2 phi
         //dVdphi = mu * mu * vars.phi + 1.0/2.0/3.0 * lambda * vars.phi * vars.phi * vars.phi;
-        dVdphi = (mu * mu * vars.phi + 1.0/2.0/3.0 * lambda * vars.phi * vars.phi * vars.phi) * pow(1.0 + 1.0/pi*(atan(abs(r)-110.0)+pi/2.0), 2);
+        dVdphi = (mu * mu * vars.phi + 1.0/2.0/3.0 * lambda * vars.phi * vars.phi * vars.phi) * pow(1.0 + 1.0/pi*(atan(abs(r)-470.0)+pi/2.0), 2);
     }
 };
 
