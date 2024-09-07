@@ -41,16 +41,20 @@ class InitialScalarData
       double pi = M_PI;
       std::random_device dev;
       std::mt19937 rng;
+      std::mt19937 rng2;
       std::seed_seq sseq{1, 2, 3};
+      std::seed_seq sseq2{4, 5, 6};
       rng.seed(sseq);
+      rng2.seed(sseq2);
       std::uniform_real_distribution<double> distributiont(0.0,pi);   //random number from 0 to pi
       std::uniform_real_distribution<double> distributionpi(0.0,2*pi);//random number from 0 to 2pi
+      std::uniform_real_distribution<double> distributionph(0.0,2*pi);//random number from 0 to 2pi
       // Generate velocity and random phase
       double mu = m_params.mass; // scalar field mass
       for (int i = 0; i < n_modes; i++){
         v_theta[i] = distributiont(rng); // velocity diirection theta
         v_phi[i] = distributionpi(rng); // velocity diirection phi
-        v_phase[i] = distributionpi(rng); // velocity phase
+        v_phase[i] = distributionph(rng2); // velocity phase
         omg[i] = std::sqrt(mu*mu + mu*mu*v_amp*v_amp);
       }
     }
